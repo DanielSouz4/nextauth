@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import { parseCookies, setCookie } from 'nookies'
 import { signOut } from '../contexts/AuthContexts'
+import { AuthTokenError } from '../errors/AuthTokenError'
 
 let isRefreshing = false
 let failedRequestsQueue = []
@@ -29,8 +30,6 @@ export function setupAPIClient(ctx = undefined) {
 
           if (!isRefreshing) {
             isRefreshing = true
-
-            console.log('refresh')
 
             api
               .post('/refresh', {
@@ -87,6 +86,8 @@ export function setupAPIClient(ctx = undefined) {
         } else {
           if (process.browser) {
             signOut()
+          } else {
+            return Promise.reject(new AuthTokenError())
           }
         }
       }
